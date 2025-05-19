@@ -1,0 +1,103 @@
+<!-- templates/dvdrental_prediction/dashboard.html -->  
+{% load static %}  
+<!DOCTYPE html>  
+<html>  
+<head>  
+    <meta charset="UTF-8">  
+    <title>Customer Prediction</title>  
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  
+    <style>  
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; }  
+        .form-group { margin-bottom: 15px; }  
+        label { display: block; margin-bottom: 5px; }  
+        input { width: 100%; padding: 8px; }  
+        button { padding: 10px 20px; margin-top: 10px; }  
+        #statusBox { margin-top: 20px; padding: 10px; }  
+    </style>  
+</head>  
+<body>  
+    <div class="container">  
+        <h1>Customer Value Prediction</h1>  
+        <form id="predictionForm">  
+            <div class="form-group">  
+                <label for="store_id">Store ID:</label>  
+                <input type="number" id="store_id" required min="1" max="2" value="1">  
+            </div>  
+            <!-- <div class="form-group">  
+                <label for="active">Active (0 or 1):</label>  
+                <input type="number" id="active" required min="0" max="1" value="1">  
+            </div>   -->
+            <div class="form-group">  
+                <label for="total_payment">Total Payment:</label>  
+                <input type="number" id="total_payment" required min="0" step="0.01">  
+            </div>  
+            <div class="form-group">  
+                <label for="payment_count">Payment Count:</label>  
+                <input type="number" id="payment_count" required min="0">  
+            </div>  
+            <div class="form-group">  
+                <label for="average_payment">Average Payment:</label>  
+                <input type="number" id="average_payment" required min="0" step="0.01">  
+            </div>  
+            <button type="submit">Predict</button>  
+        </form>  
+        <div id="statusBox"></div>  
+        <canvas id="predictionChart"></canvas>  
+    </div>  
+  
+    <script>  
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {  
+            e.preventDefault();  
+            const statusBox = document.getElementById('statusBox');  
+            const formData = {  
+                store_id: document.getElementById('store_id').value,   
+                total_payment: document.getElementById('total_payment').value,  
+                payment_count: document.getElementById('payment_count').value,  
+                average_payment: document.getElementById('average_payment').value  
+            };  
+  
+            try {  
+                const response = await fetch('/predict-customer/', {  
+                    method: 'POST',  
+                    headers: {  
+                        'Content-Type': 'application/json',  
+                    },  
+                    body: JSON.stringify(formData)  
+                });  
+  
+                const data = await response.json();  
+                if (data.error) {  
+                    throw new Error(data.error);  
+                }  
+  
+                statusBox.textContent = `Prediction: ${data.prediction}`;  
+                  
+                // Create chart  
+                const ctx = document.getElementById('predictionChart').getContext('2d');  
+                new Chart(ctx, {  
+                    type: 'bar',  
+                    data: {  
+                        labels: ['Class 0', 'Class 1'],  
+                        datasets: [{  
+                            label: 'Prediction Probability',  
+                            data: data.probability,  
+                            backgroundColor: ['rgba(255,99,132,0.2)', 'rgba(54,162,235,0.2)'],  
+                            borderColor: ['rgba(255,99,132,1)', 'rgba(54,162,235,1)'],  
+                            borderWidth: 1  
+                        }]  
+                    },  
+                    options: {  
+                        scales: {  
+                            y: {  
+                                beginAtZero: true  
+                            }  
+                        }  
+                    }  
+                });  
+            } catch (error) {  
+                statusBox.textContent = `Error: ${error.message}`;  
+            }  
+        });  
+    </script>  
+</body>  
+</html>  

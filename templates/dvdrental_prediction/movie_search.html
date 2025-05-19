@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1">  
+  <title>{{ movie.title }} - Details</title>  
+  <link rel="stylesheet" href="/static/css/style.css">  
+  <style>  
+    body {  
+      font-family: Arial, sans-serif;  
+      margin: 0;  
+      padding: 20px;  
+      background-color: #f4f4f4;  
+    }  
+    .container {  
+      max-width: 800px;  
+      margin: auto;  
+      background: yellowgreen;  
+      padding: 20px;  
+      border-radius: 8px;  
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);  
+    }  
+    h1 {  
+      margin-bottom: 10px;  
+    }  
+    .movie-meta p {  
+      margin: 5px 0;  
+    }  
+    .description {  
+      margin-top: 20px;  
+    }  
+  </style>  
+</head>  
+<body>  
+  <div class="container">  
+    <h1>{{ movie.title }}</h1>  
+    <ul>
+        {% for movie in movies %}  
+            <li><span class="actor-item">{{ movie.title }} ({{ movie.release_year }})</span>
+        {% empty %}
+            <li>No Movies Found.</li>
+        <br>
+        </li>
+        {% endfor %} 
+    </ul>
+
+    
+    <!-- You could add extra sections such as cast, reviews, etc. -->  
+    <div class="actions">  
+        <a href = "{% url 'movie_list' %}">Back to Movie List</a> 
+    </div>  
+  </div>  
+</body>  
+</html>  
